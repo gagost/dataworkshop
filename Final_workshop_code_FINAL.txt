@@ -1,0 +1,292 @@
+﻿######Cell 1
+#Click anywhere in this cell, then click "Shift" and "Enter"
+print("Thundercats are GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+
+######Cell 2
+import pandas as pd
+import numpy as np
+import matplotlib as mpl
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy import stats
+
+
+######Cell 3
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', None)
+
+
+######Cell 4
+print(8675300+9)
+
+
+######Cell 5
+print("I love coding!")
+
+
+######Cell 6
+print("This is the bee's knees")
+
+
+######Cell 7
+print("Go")
+# is good for silencing short comments
+print("Little")
+"""
+But for long, multi-line comments you want to go with the triple quotes
+"""
+print("Rockstar")
+
+
+######Cell 8
+peptalk=print("You've got this")
+peptalk
+
+
+######Cell 9
+list=['I','Love','Python']
+list
+
+
+######Cell 10
+A="The"
+B="Ohio"
+C="State"
+print(A,B,C)
+
+
+######Cell 11
+url='https://raw.githubusercontent.com/gagost/dataworkshop/cf6e1a6af9c4cfef8af0e963ee4d4ef6aaa07aef/30March_Data_Odontometric_csv.csv'
+df = pd.read_csv(url, encoding= 'unicode_escape')
+
+
+######Cell 12
+#Shows the first 10 rows of the data frame
+df.head(10)
+
+
+######Cell 13
+missing_data=df.isnull()
+result=[]
+for column in missing_data.columns.values.tolist():
+    na=missing_data[column].value_counts()
+    result.append(na)
+    
+#What the heck? Where is my output? 
+#?????
+
+
+######Cell 14
+df.describe()
+
+
+######Cell 15
+plt.hist(df[['Bi_UCMD_mm']])
+
+
+######Cell 16
+plt.hist(df[['Bi_UI1BL_mm']],color='red')
+
+
+######Cell 17
+plt.hist(df[['Bi_UM1MLDB_mm']],color='red',edgecolor='yellow',linewidth=1)
+
+
+######Cell 18
+plt.hist(df[['Bi_UM1MLDB_mm']],color='red',edgecolor='yellow',linewidth=3)
+
+
+######Cell 19
+print(df.columns.values)
+
+
+######Cell 20
+#Your own code
+
+
+######Cell 21
+#Your own code
+
+
+######Cell 22
+#Your own code
+
+
+######Cell 23
+#Let's say we want to make some boxplots to show us some summary stats about the incisors in our sample. 
+
+#Lets subset the Incisal MD values
+Incisors=df[["Bi_UI1MD_mm","Bi_UI2MD_mm","Bi_LI1MD_mm","Bi_LI2MD_mm"]]
+
+#Drop rows with missing data
+Incisors.dropna(axis=0,how='any',thresh=None,subset=None,inplace=True)
+
+#How can we make sure it worked? 
+#??????
+
+
+######Cell 24
+#Time for pretty pictures
+box=plt.boxplot(Incisors, patch_artist=True,labels=['Upper_Central','Upper_Lateral','Lower_Central','Lower_Lateral'])
+
+#https://matplotlib.org/3.5.0/gallery/statistics/boxplot_color.html
+
+"""
+#Color
+colors = ['red', 'orange', 'blue','green']
+for bplot in (box):
+    for patch, color in zip(box['boxes'], colors):
+        patch.set_facecolor(color)
+"""
+
+
+######Cell 25
+#Lets say we want to look at the %Completion value for incisors only by Ancestry
+
+#Make the variable
+df['Incisors_Comp%']=((df[["Bi_UI1MD_mm","Bi_UI2MD_mm","Bi_LI1MD_mm","Bi_LI2MD_mm"]].count(axis=1))/4)*100
+
+#How can we make sure it worked? 
+#???????
+
+#Plot time!
+#sns.catplot("Ancestry", col="Incisors_Comp%", hue="Sex", col_wrap=5, data=df, kind="count", height=5.5, aspect=0.9, palette='BuPu')
+
+#Hue palettes here: https://medium.com/@morganjonesartist/color-guide-to-seaborn-palettes-da849406d44f
+#User guide: https://seaborn.pydata.org/tutorial.html#
+
+
+######Cell 26
+#Cool, let's count how many observations there are by age and ancestry
+sns.catplot("Ancestry", col="Age_Group", col_wrap=3, data=df, kind="count", height=5.5, aspect=0.9, palette='tab20')
+
+
+######Cell 27
+#Hmmmm...let's dissect this a little bit more. Let's do a violin plot so we can use continuous age! Let's also add in sex and region
+sns.catplot(x="Age_Clean_yr", y="Region", hue="Sex", col="Ancestry", data=df, orient="h", kind="violin", height=5.5, aspect=1, palette='bwr_r', dodge=True, bw=.2)
+
+#What's happening here?
+
+######Cell 28
+#Scatter plot showing the relationship between Upper incisor 1 mesiodistal and buccolingual measurements
+plt.scatter(df['Bi_UI1MD_mm'], df['Bi_UI1BL_mm'])
+
+#Do you see a relationship?
+
+
+######Cell 29
+#Lets combine histos and scatters and throw on a best fit line!
+sns.jointplot(data=df, x='Bi_UI1MD_mm', y='Bi_UI1BL_mm', kind="reg")
+
+#Now do you see a relationship?
+
+
+######Cell 30
+#Regression plot, Upper molar 1 BL on MD, sex-specific
+regplot = sns.lmplot(x="Bi_UM1BL_mm", y="Bi_UM1MD_mm", hue="Sex", data=df, height=7, aspect=1.6, robust=True, palette='cubehelix_r', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+#Note: if you are working with ordinal data, you might find it useful to do a jitterplot instead
+
+
+######Cell 31
+#Regression plot, Lower molar 1 BL on MD, sex-specific
+regplot = sns.lmplot(x="Bi_LM1BL_mm", y="Bi_LM1MD_mm", hue="Sex", data=df, height=7, aspect=1.6, robust=True, palette='cubehelix_r', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+
+
+######Cell 32
+#Ugh, size. Size is boring and biasing and doesn't tell us anything we don't already know. Let's see what happens when we take it away.
+
+#Make an index of the BL and MD dimension of the first upper molar
+df['M1U_index']=df['Bi_UM1BL_mm']/df['Bi_UM1MD_mm']
+df['M1L_index']=df['Bi_LM1BL_mm']/df['Bi_LM1MD_mm']
+
+#Look at how the relationship changes
+regplot = sns.lmplot(x="M1U_index", y="M1L_index", hue="Sex", data=df, height=7, aspect=1.6, robust=True, palette='cubehelix_r', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+
+
+######Cell 33
+#Regression plot, Upper molar 1 and 2 MD, partitioned by sex
+
+#1 subset data
+df_fem=df[df.Sex=="F"]
+df_m=df[df.Sex=="M"]
+
+#Make regression plot on subsetted data -- females
+regplot = sns.lmplot(x="Bi_UM2MD_mm", y="Bi_UM1MD_mm", hue="Ancestry", data=df_fem, height=7, aspect=1.6, robust=True, palette='tab10', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+plt.title('Females')
+
+#Make regression plot on subsetted data -- females
+regplot = sns.lmplot(x="Bi_UM2MD_mm", y="Bi_UM1MD_mm", hue="Ancestry", data=df_m, height=7, aspect=1.6, robust=True, palette='tab10', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+plt.title('Males')
+
+
+######Cell 34
+#Regression plot, Age on %Completion by sex
+regplot = sns.lmplot(x="Age_Clean_yr", y="Completion_%", hue="Sex", data=df, height=7, aspect=1.6, robust=True, palette='cool', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+
+#Do the relationships appear to vary by sex?
+
+
+######Cell 35
+#Regression plot, Age on %Completion by ancestry
+regplot = sns.lmplot(x="Age_Clean_yr", y="Completion_%", hue="Ancestry", data=df, height=7, aspect=1.6, robust=True, palette='icefire', scatter_kws=dict(s=60, linewidths=.7, edgecolors='black'))
+
+#Do the relationships appear to vary by ancestry?
+
+
+######Cell 36
+#Why guess when we can know? Let's do an ANOVA for fun.
+
+import scipy.stats as stats
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+
+df.rename(columns={"Completion_%":"Completion"},inplace=True)
+model = ols('Completion ~ Ancestry*Age_Group', data=df).fit()
+anova_table = sm.stats.anova_lm(model, typ=2)
+anova_table
+
+
+######Cell 37
+#Your code
+
+
+######Cell 38
+#Your code
+
+
+######Cell 39
+#Your code
+
+
+######If we have time for more stats
+
+from sklearn.linear_model import LinearRegression
+df2=df[['Age_Clean_yr','Completion']]
+df3=df2.dropna()
+x=df3[['Age_Clean_yr']]
+y=df3[['Completion']]
+model = LinearRegression().fit(x,y)
+r_sq = model.score(x, y)
+print('R2:', r_sq)
+print('intercept:', model.intercept_)
+print('slope:', model.coef_)
+
+
+df2=df[['Bi_LM1BL_mm','Bi_LM1MD_mm']]
+df3=df2.dropna()
+x=df3[['Bi_LM1BL_mm']]
+y=df3[['Bi_LM1MD_mm']]
+model = LinearRegression().fit(x,y)
+r_sq = model.score(x, y)
+print('R2:', r_sq)
+print('intercept:', model.intercept_)
+print('slope:', model.coef_)
+
+
+
+
+
+
